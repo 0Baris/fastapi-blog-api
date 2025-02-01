@@ -1,7 +1,7 @@
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, Text, Column
+from sqlalchemy import String, Boolean, DateTime, ForeignKey, Text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from datetime import datetime
-from .database import Base
+from datetime import datetime, timezone
+from api.database import Base
 
 ## Kullanıcı Modeli
 class User(Base):
@@ -25,7 +25,7 @@ class Category(Base):
     title: Mapped[str] = mapped_column(String(30), unique=True, index=True)
 
     ## Modeller arası ilişki.
-    posts = relationship("Post", back_populates="category")
+    posts = relationship("Post", back_populates="category", lazy="select", cascade="all, delete-orphan" )
 
 ## Gönderi Modeli
 class Post(Base):
@@ -36,13 +36,13 @@ class Post(Base):
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     title: Mapped[str] = mapped_column(String(100), index=True)
     content: Mapped[str] = mapped_column(Text, index=True)
-    published: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    published: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
     
     
     ## Modeller arası ilişki.
     author = relationship("User", back_populates="posts")
-    category = relationship("Category", back_populates="posts")
-    comments = relationship("Comment", back_populates="post")
+    category = relationship("Category", back_populates="posts", lazy="select")
+    comments = relationship("Comment", back_populates="post", cascade="all, delete-orphan")
 
 ## Yorum Modeli
 class Comment(Base):
@@ -52,8 +52,8 @@ class Comment(Base):
     post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"))
     author_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     content: Mapped[str] = mapped_column(Text, index=True)
-    published: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    published: Mapped[datetime] = mapped_column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     ## Modeller arası ilişki.
-    post = relationship("Post", back_populates="comments")
+    post = relationship("Post", back_populates="comments", lazy="select")
     author = relationship("User", back_populates="comments")

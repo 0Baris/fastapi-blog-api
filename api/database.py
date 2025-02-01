@@ -1,10 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+import os
+from dotenv import load_dotenv
 
-# SQLALCHEMY_DATABASE_URL = "postgresql://kullanıcıadı:sifre@localhost/veritabanıismi" -- PostgreSQL Bağlantısı
-
-# SQlite geliştirme için yeterli.
-SQLALCHEMY_DATABASE_URL = 'sqlite:///./blog.db'
+load_dotenv(dotenv_path="../.env")
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Veritabanı işlemleri
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

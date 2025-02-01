@@ -3,7 +3,6 @@ from typing import List, Optional
 from datetime import datetime
 
 # User Şeması
-
 class UserBase(BaseModel):
     username: str
     email: str
@@ -14,14 +13,13 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     is_active: bool
-    posts: List["Post"] = []
+    posts: List["Post"] = [] 
     comments: List["Comment"] = []
 
     class Config:
         from_attributes = True
 
 # Category Şeması
-
 class CategoryBase(BaseModel):
     title: str
 
@@ -31,8 +29,6 @@ class CategoryCreate(CategoryBase):
 class Category(CategoryBase):
     id: int
 
-    posts: List["Post"] = []
-
     class Config:
         from_attributes = True
 
@@ -40,40 +36,45 @@ class CategoryIn(CategoryBase):
     pass
 
 # Post Şeması
-
 class PostBase(BaseModel):
     title: str
     content: str
 
 class PostCreate(PostBase):
     category_id: int
+    author_id: int
 
 class Post(PostBase):
     id: int
     published: datetime
+    category_id: int
     author_id: int
-    category: Category
-    comments: List["Comment"] = []
+    category: Optional["Category"]
+    comments: List["Comment"] = [] 
 
     class Config:
         from_attributes = True
 
-# Comment Şeması
+class PostIn(PostBase):
+    pass
 
+# Comment Şeması
 class CommentBase(BaseModel):
     content: str
 
 class CommentCreate(CommentBase):
-    post_id: int
+    author_id: int
 
 class Comment(CommentBase):
     id: int
     published: datetime
     author_id: int
-    post: Post
 
     class Config:
         from_attributes = True
 
+# İleri Referansları Çözme
+User.update_forward_refs()
+Category.update_forward_refs()
 Post.update_forward_refs()
 Comment.update_forward_refs()
