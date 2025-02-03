@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 
+experimental.py
 blog.db
 
 # Distribution / packaging

@@ -1,7 +1,9 @@
 from sqlalchemy import String, Boolean, DateTime, ForeignKey, Text
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import relationship, Mapped, mapped_column, DeclarativeBase
 from datetime import datetime, timezone
-from api.database import Base
+
+class Base(DeclarativeBase):
+    pass
 
 ## Kullanıcı Modeli
 class User(Base):
