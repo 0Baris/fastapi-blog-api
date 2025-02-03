@@ -40,10 +40,10 @@ Bu proje, FastAPI kullanarak geliştirilmiş bir Blog API'sidir. Kullanıcılar�
 3. **.env Dosyasını Oluşturma ve Yapılandırma:**
    Projenin kök dizininde `.env` dosyası oluşturun ve aşağıdaki ortam değişkenlerini ekleyin:
    ```env
-   POSTGRES_USER=blog_ad
-   POSTGRES_PASSWORD=blog_sifre
-   POSTGRES_DB=blog_db
-   DATABASE_URL=postgresql://blog_ad:blog_sifre@db:5432/blog_db
+   POSTGRES_USER=postre-adınız
+   POSTGRES_PASSWORD=postre-sifreniz
+   POSTGRES_DB=db-ismi
+   DATABASE_URL=postgresql://ad:sifre@db:5432/db-ismi
    ```
 
 4. **Docker Konteynerlerini Başlatma:**
