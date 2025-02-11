@@ -2,6 +2,8 @@ from sqlalchemy.orm import Session, joinedload
 from api.database.models import Comment, Post, User
 from datetime import datetime
 
+
+
 def create_comment(db: Session, post_id: int, comment_data: dict):
     """Yeni bir yorum oluşturur."""
     # Gönderi kontrolü

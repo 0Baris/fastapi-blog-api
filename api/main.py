@@ -19,7 +19,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-
 @app.on_event("startup")
 async def startup_event():
     """Uygulama başladığında veritabanı tablolarını oluşturur."""

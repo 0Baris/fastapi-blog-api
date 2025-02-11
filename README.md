@@ -35,6 +35,10 @@ Bu proje, FastAPI kullanılarak geliştirilmiş bir Blog API'sidir. Kullanıcıl
   - Kullanıcı parolaları için güvenli hashleme (bcrypt).
   - Ortam değişkenleriyle veritabanı bağlantı bilgilerini yönetme.
 
+- **Mail Entragrasyonu:**
+  - Kullanıcı yeni hesap oluştururken onay e-postası gönderme simülasyonu yapar.
+  - Yeni bir yorum eklendiği zaman gönderi sahibine bilgilendirme yapar.
+
 ---
 
 ## 🛠️ Teknolojiler
@@ -44,6 +48,8 @@ Bu proje, FastAPI kullanılarak geliştirilmiş bir Blog API'sidir. Kullanıcıl
   - [SQLAlchemy](https://www.sqlalchemy.org/): Python için güçlü bir ORM.
   - [PostgreSQL](https://www.postgresql.org/): Güçlü bir ilişkisel veritabanı sistemine dayalı.
   - [bcrypt](https://pypi.org/project/bcrypt/): Parola hashleme işlemleri için kullanılır.
+  - [Celery](http://www.celeryproject.org/): Asenkron görev kuyruğu ve dağıtılmış görev işleme sistemi.
+  - [Redis](https://redis.io/): Hızlı, açık kaynaklı, bellek içi veri yapısı deposu.
 
 - **Diğer:**
   - [Pydantic V2](https://pydantic-docs.helpmanual.io/): Veri doğrulama ve seri hale getirme işlemleri için.
@@ -73,17 +79,23 @@ Bu proje, FastAPI kullanılarak geliştirilmiş bir Blog API'sidir. Kullanıcıl
    Projenin kök dizininde `.env` dosyası oluşturun ve aşağıdaki ortam değişkenlerini ekleyin:
 
    ```env
-   POSTGRES_USER=blog_user  # PostgreSQL kullanıcı adı
-   POSTGRES_PASSWORD=blog_pass  # PostgreSQL şifresi
-   POSTGRES_DB=blog_db  # PostgreSQL veritabanı adı
-   DATABASE_URL=postgresql://blog_user:blog_pass@db:5432/blog_db  # Veritabanı bağlantısı
+    POSTGRES_USER=blog_user  # PostgreSQL kullanıcı adı
+    POSTGRES_PASSWORD=blog_pass  # PostgreSQL şifresi
+    POSTGRES_DB=blog_db  # PostgreSQL veritabanı adı
+    DATABASE_URL=postgresql://blog_user:blog_pass@db:5432/blog_db  # Veritabanı bağlantısı
+    
+    CELERY_BROKER_URL=redis://localhost:6379/0  # Celery broker (Redis) URL'i
+    CELERY_RESULT_BACKEND=redis://localhost:6379/0  # Celery sonuç backend'i (Redis) URL'i
+
+    MAIL_USERNAME=xyz@gmail.com  # E-posta gönderme kullanıcı adı
+    MAIL_PASSWORD=apppasword  # E-posta gönderme şifresi (uygulama şifresi)
+    MAIL_FROM=xyz@gmail.com  # Gönderen e-posta adresi
+    MAIL_PORT=587  # E-posta sunucu portu
+    MAIL_SERVER=smtp.gmail.com  # E-posta sunucu adresi
+    MAIL_FROM_NAME="Blog API"  # Gönderen adı
+    MAIL_TLS=True  # TLS şifrelemesi kullanılsın mı?
+    MAIL_SSL=False  # SSL şifrelemesi kullanılsın mı?
    ```
-
-    > **Önemli:** docker-compose.yml dosyasındada bu işlemleri tekrarlamanız gerekiyor.
-
-   #### **Notlar:**
-   - `POSTGRES_USER`, `POSTGRES_PASSWORD`, ve `POSTGRES_DB` değerlerini kendi yapılandırmanıza göre güncelleyin.
-   - `DATABASE_URL`: Veritabanı bağlantısını belirtir. `db` değeri, Docker Compose içindeki PostgreSQL servisinin adıdır.
 
 3. **Docker Konteynerlerini Başlatma:**
 
@@ -262,8 +274,9 @@ Bu proje [MIT Lisansı](LICENSE) altında lisanslanmıştır.
 - [SQLAlchemy ORM Dokümantasyonu](https://docs.sqlalchemy.org/en/20/orm/mapping_styles.html)
 - [Using FastAPI with SQLAlchemy](https://blog.stackademic.com/using-fastapi-with-sqlalchemy-5cd370473fe5)
 - [Build a CRUD App with FastAPI and SQLAlchemy](https://codevoweb.com/build-a-crud-app-with-fastapi-and-sqlalchemy/)
-- [Creating a CRUD API with FastAPI](https://medium.com/@stanker801/creating-a-crud-api-with-fastapi-sqlalchemy-postgresql-postman-pydantic-1ba6b9de9f23)
-- [Strong Password Hashing with SQLAlchemy](https://medium.com/@sharoze.archer/strong-password-hashing-with-sqlalchemy-for-enhanced-database-security-efc4ecda9f08)
+- [Creating a CRUD API with FastAPI, Medium](https://medium.com/@stanker801/creating-a-crud-api-with-fastapi-sqlalchemy-postgresql-postman-pydantic-1ba6b9de9f23)
+- [Strong Password Hashing with SQLAlchemy, Medium](https://medium.com/@sharoze.archer/strong-password-hashing-with-sqlalchemy-for-enhanced-database-security-efc4ecda9f08)
+- [Empowering Applications with Asynchronous Magic, Medium](https://medium.com/@youssefchamrah/empowering-applications-with-asynchronous-magic-the-celery-fastapi-docker-and-flower-ac119efc2e04)
 
 ---
 

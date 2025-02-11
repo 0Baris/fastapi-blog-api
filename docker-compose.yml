@@ -1,3 +1,5 @@
+version: '3.9'
+
 services:
   app:
     build: .
@@ -6,34 +8,91 @@ services:
     volumes:
       - .:/app
     environment:
-      - DATABASE_URL=postgresql://postgres:1234@db:5432/blogapp
+      - DATABASE_URL=postgresql://postgres:1234@db:5432/blogapp?client_encoding=utf8
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MAIL_FROM=${MAIL_FROM}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - MAIL_TLS=${MAIL_TLS}
+      - MAIL_SSL=${MAIL_SSL}
     depends_on:
       db:
         condition: service_healthy
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 3
 
   db:
     image: postgres:14
     restart: always
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: blogapp
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_INITDB_ARGS: --encoding=UTF8 --locale=en_US.utf8
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d blogapp"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  celery_worker:
+    build: .
+    command: celery -A api.celery.celery_app worker --loglevel=info
+    volumes:
+      - .:/app
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - MAIL_FROM=${MAIL_FROM}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_SERVER=${MAIL_SERVER}
+      - MAIL_FROM_NAME=${MAIL_FROM_NAME}
+      - MAIL_TLS=${MAIL_TLS}
+      - MAIL_SSL=${MAIL_SSL}
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  flower:
+    image: mher/flower:latest
+    ports:
+      - "5555:5555"
+    command: celery flower -A api.tasks.celery_app --address=0.0.0.0 --port=5555
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
+      celery_worker:
+        condition: service_started
+
 volumes:
   postgres_data:
+  redis_data:

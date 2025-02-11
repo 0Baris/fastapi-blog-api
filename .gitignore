@@ -8,6 +8,7 @@ __pycache__/
 
 experimental.py
 blog.db
+image_processing.py
 
 # Distribution / packaging
 .Python
