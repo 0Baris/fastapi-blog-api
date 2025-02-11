@@ -4,15 +4,13 @@ from dotenv import load_dotenv
 
 load_dotenv(dotenv_path=".env")
 
-# Initialize Celery app
 celery_app = Celery(
     "blog_api_tasks",
     broker=os.getenv("CELERY_BROKER_URL"),
     backend=os.getenv("CELERY_RESULT_BACKEND"),
-    include=['api.tasks.email']  # Add specific task modules
+    include=['api.tasks.email']
 )
 
-# Configure Celery
 celery_app.conf.update(
     task_serializer='json',
     accept_content=['json'],
@@ -25,5 +23,4 @@ celery_app.conf.update(
     worker_max_tasks_per_child=50
 )
 
-# Discover tasks in the api package
 celery_app.autodiscover_tasks(['api'])
